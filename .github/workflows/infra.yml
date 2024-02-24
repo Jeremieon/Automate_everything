@@ -33,15 +33,16 @@ jobs:
         }
         EOF
 
-    - name: Terraform Init
-      working-directory: infra
-      run: terraform init
+    # - name: Terraform Init
+    #   working-directory: infra
+    #   run: terraform init
 
-    - name: Terraform Plan
-      working-directory: infra
-      run: terraform plan
+    # - name: Terraform Plan
+    #   working-directory: infra
+    #   run: terraform plan
 
     - name: Terraform Init & Apply
+      working-directory: infra
       run: |
        terraform init \
         -backend-config="address=https://app.terraform.io" \
