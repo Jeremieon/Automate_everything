@@ -35,17 +35,24 @@ jobs:
         }
         EOF
 
-    - name: Initialize TErraform
+    - name: Initialize Terraform
       id: init
+      if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
       run: terraform init
 
     - name: Terraform Validate
       id: validate
+      if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
       run: terraform validate -no-color
 
     - name: Terraform Plan
+      if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
       run: terraform plan
     
     - name: Deploy Infrastructure
+      if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
       run: terraform apply -auto-approve
 
+    - name: Terraform Destroy
+      if: github.event_name == 'push' && contains(github.event.head_commit.message, 'destroy')
+      run: terraform destroy -auto-approve
