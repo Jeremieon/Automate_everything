@@ -6,18 +6,20 @@ on:
       - ec2
 
 jobs:
-  terraform:
+  deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Setup Terraform Connect
-      uses: hashicorp/setup-terraform@v1
+    - name: Set up terraform
+      uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.1.0
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
     
     - name: Setup Terraform Backend
       id: backend
@@ -33,22 +35,19 @@ jobs:
         }
         EOF
 
-    # - name: Terraform Init
-    #   working-directory: infra
-    #   run: terraform init
+    - name: Initialize TErraform
+      id: init
+      run: terraform init
 
-    # - name: Terraform Plan
-    #   working-directory: infra
-    #   run: terraform plan
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
 
-    - name: Terraform Init & Apply
-      working-directory: infra
-      run: |
-       terraform init \
-        -backend-config="address=https://app.terraform.io" \
-        -backend-config="organization='${{ secrets.TF_CLOUD_ORGANIZATION }}'" \
-        -backend-config="workspaces/name='${{ secrets.TF_EC2_WORKSPACE }}'"
-       terraform apply -auto-approve
+    - name: Terraform Plan
+      run: terraform plan
+    
+    - name: Deploy Infrastructure
+      run: terraform apply -auto-approve
 
     - name: Terraform Destroy
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'destroy')
