@@ -23,10 +23,10 @@ jobs:
 
     - name: Configure Terraform Cloud
       run: |
-        terraform login ${{ secrets.TF_API_TOKEN }}
+        terraform login ${{ secrets.TF_API_TOKEN }} || exit 1
         terraform init \
           -backend-config="organization=${{ secrets.TF_CLOUD_ORGANIZATION }}" \
-          -backend-config="workspace=${{ secrets.TF_EC2_WORKSPACE }}"
+          -backend-config="workspace=${{ secrets.TF_EC2_WORKSPACE }}" || exit 1
 
     - name: Terraform Destroy
       run: terraform destroy -auto-approve
