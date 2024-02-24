@@ -34,19 +34,19 @@ jobs:
         EOF
 
     - name: Terraform Init
-      working-directory: ../infra
+      working-directory: infra
       run: terraform init
 
     - name: Terraform Plan
-      working-directory: ../infra
+      working-directory: infra
       run: terraform plan
 
     - name: Terraform Apply
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
-      working-directory: ../infra
+      working-directory: infra
       run: terraform apply -auto-approve
 
     - name: Terraform Destroy
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'destroy')
-      working-directory: ../infra
+      working-directory: infra
       run: terraform destroy -auto-approve
