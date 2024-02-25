@@ -6,7 +6,7 @@ on:
       - ec2
 
 jobs:
-  deploy:
+  infra:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -55,3 +55,23 @@ jobs:
     - name: Terraform Destroy
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'destroy')
       run: terraform destroy -auto-approve
+  
+  ssh_into_ec2:
+      runs-on: ubuntu-latest
+      needs: infra
+      steps:
+        - name: Get Public IP
+          id: get_public_ip
+          run: echo "::set-output name=public_ip::$(terraform output public_ip)"
+          working-directory: .infra
+  
+        - name: SSH into EC2 Instance
+          if: github.event_name == 'push' && contains(github.event.head_commit.message, 'ssh')
+          run: |
+            PRIVATE_KEY="${{ secrets.PRIVATE_KEY_SECRET }}"
+            PUBLIC_IP=${{ needs.infra.outputs.get_public_ip }}
+            echo "$PRIVATE_KEY" > private_key.pem
+            chmod 600 private_key.pem
+            ssh -i private_key.pem ec2-user@$PUBLIC_IP "echo Hello from SSH"
+          env:
+            PRIVATE_KEY_SECRET: ${{ secrets.PRIVATE_KEY_SECRET }}

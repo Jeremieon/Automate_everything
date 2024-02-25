@@ -17,6 +17,10 @@ variable "instance_type" {
 #   type = string
 # }
 
+variable "key-pair" {
+  description = "SSH Key"
+  type = string
+}
 variable "instance_name" {
   description = "Unique name for resources create"
   type = string

@@ -83,6 +83,7 @@ resource "aws_instance" "myEc2-instance" {
   instance_type = var.instance_type
   subnet_id = aws_subnet.public_subnet.id
   security_groups = [aws_security_group.my_app_sg.id]
+  key_name = var.key-pair
   #user_data = var.user_data
 
   tags = {
