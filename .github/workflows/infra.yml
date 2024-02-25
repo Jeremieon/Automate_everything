@@ -63,19 +63,19 @@ jobs:
       
       steps:
 
-        - name: Terraform Init & Apply
+        - name: Terraform Init & Output
           run: |
             terraform init \
               -backend-config="address=https://app.terraform.io" \
-              -backend-config="organization='${{ secrets.TF_CLOUD_ORGANIZATION }}'" \
-              -backend-config="workspaces/name='${{ secrets.TF_EC2_WORKSPACE }}'"
-            export TF_PUBLIC_IP=$(terraform output -raw public_ip)
+              -backend-config="organization=${{ secrets.TF_CLOUD_ORGANIZATION }}" \
+              -backend-config="workspaces/name=${{ secrets.TF_EC2_WORKSPACE }}"
+            TF_PUBLIC_IP=$(terraform output -raw public_ip)
             echo "TF_PUBLIC_IP=$TF_PUBLIC_IP" >> $GITHUB_ENV
 
-        - name: Get Public IP
-          id: get_public_ip
-          run: echo "::set-output name=public_ip::$(terraform output public_ip)"
-          #working-directory: infra
+        # - name: Get Public IP
+        #   id: get_public_ip
+        #   run: echo "::set-output name=public_ip::$(terraform output public_ip)"
+        #   #working-directory: infra
   
         - name: SSH into EC2 Instance
           if: github.event_name == 'push' && contains(github.event.head_commit.message, 'ssh')
