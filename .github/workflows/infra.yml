@@ -66,9 +66,6 @@ jobs:
         - name: Terraform Init & Output
           run: |
             terraform init \
-              -backend-config="address=https://app.terraform.io" \
-              -backend-config="organization=${{ secrets.TF_CLOUD_ORGANIZATION }}" \
-              -backend-config="workspaces/name=${{ secrets.TF_EC2_WORKSPACE }}"
             TF_PUBLIC_IP=$(terraform output -raw public_ip)
             echo "TF_PUBLIC_IP=$TF_PUBLIC_IP" >> $GITHUB_ENV
 
