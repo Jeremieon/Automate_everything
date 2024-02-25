@@ -11,8 +11,6 @@ jobs:
     defaults:
       run:
         working-directory: ./infra
-    outputs:
-      pub_ip: ${{ steps.get-public-ip.outputs.pub_ip }}
 
     steps:
     - name: Checkout code
@@ -54,25 +52,10 @@ jobs:
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
       run: terraform apply -auto-approve
 
-    # - name: Get Public IP
-    #   id: get-public-ip
-    #   run: |
-    #     PUBLIC_IP=$(terraform output public_ip)
-    #     echo "Public IP: $PUBLIC_IP"
-    #     echo "::set-output name=public_ip::$PUBLIC_IP"
-
     - name: Get Public IP
       id: get-public-ip
-      env:
-        TF_CLI_CONFIG_FILE: /dev/null
-        TF_CLI_ARGS: "-token=VcPSBwbvKAWN2A.atlasv1.cZSn3xicI1lOQyb0fxDyvqCslsfB5S3T0FFo9PlFeyCAezHDw8dKyzuo1RdVsTYu8ME"
-    
       run: |
-        # Use the Terraform Cloud token directly, skipping 'terraform login'
-        PUBLIC_IP=$(terraform show -json | jq -r '.values.outputs.public_ip.value')
-        echo "Public IP: $PUBLIC_IP"
-    
-        # Set GitHub Actions output variable
+        PUBLIC_IP=$(terraform output public_ip)
         echo "::set-output name=public_ip::$PUBLIC_IP"
     
     - name: Terraform Destroy
@@ -83,16 +66,6 @@ jobs:
       runs-on: ubuntu-latest
       needs: infra
       steps:
-        - name: Use Public IP in Next Job
-          run: |
-            PUBLIC_IP=${{ needs.get-public-ip.output.pub_ip }}
-            echo "Using Public IP: $PUBLIC_IP"
-        # - name: Get Public IP
-        #   id: get_public_ip
-        #   run: echo "::set-output name=public_ip::$(terraform output public_ip)"
-        #   #working-directory: infra22
-       
-  
         - name: SSH into EC2 Instance
           if: github.event_name == 'push' && contains(github.event.head_commit.message, 'ssh')
           run: |
