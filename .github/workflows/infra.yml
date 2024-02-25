@@ -63,14 +63,15 @@ jobs:
 
     - name: Get Public IP
       id: get-public-ip
+      env:
+        TF_CLI_CONFIG_FILE: /dev/null
+        TF_CLI_ARGS: "-token=VcPSBwbvKAWN2A.atlasv1.cZSn3xicI1lOQyb0fxDyvqCslsfB5S3T0FFo9PlFeyCAezHDw8dKyzuo1RdVsTYu8ME"
+    
       run: |
-        # Configure Terraform CLI to use Terraform Cloud
-        terraform login
-
-        # Retrieve the public IP from Terraform Cloud output
+        # Use the Terraform Cloud token directly, skipping 'terraform login'
         PUBLIC_IP=$(terraform show -json | jq -r '.values.outputs.public_ip.value')
         echo "Public IP: $PUBLIC_IP"
-
+    
         # Set GitHub Actions output variable
         echo "::set-output name=public_ip::$PUBLIC_IP"
     
