@@ -52,6 +52,14 @@ jobs:
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
       run: terraform apply -auto-approve
 
+    - name: Get Public IP
+      id: get-public-ip
+      run: |
+        PUBLIC_IP=$(terraform output public_ip)
+        echo "Public IP: $PUBLIC_IP"
+      env:
+        TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
+
     - name: Terraform Destroy
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'destroy')
       run: terraform destroy -auto-approve
@@ -60,10 +68,9 @@ jobs:
       runs-on: ubuntu-latest
       needs: infra
       steps:
-        - name: Terraform Init & Output
+        - name: Use Public IP in Next Job
           run: |
-            TF_PUBLIC_IP=$(terraform output -raw public_ip)
-
+            echo "The Public IP is ${{ needs.terraform.outputs.PUBLIC_IP }}"
         # - name: Get Public IP
         #   id: get_public_ip
         #   run: echo "::set-output name=public_ip::$(terraform output public_ip)"
@@ -75,6 +82,6 @@ jobs:
             PRIVATE_KEY="${{ secrets.PRIVATE_KEY_SECRET }}"
             echo "$PRIVATE_KEY" > private_key.pem
             chmod 600 private_key.pem
-            ssh -i private_key.pem ec2-user@$TF_PUBLIC_IP "echo Hello from SSH"
-          env:
-            PRIVATE_KEY_SECRET: ${{ secrets.PRIVATE_KEY_SECRET }}
+            ssh -i private_key.pem ec2-user@${{ needs.terraform.outputs.PUBLIC_IP }} "echo Hello from SSH"
+          # env:
+          #   PRIVATE_KEY_SECRET: ${{ secrets.PRIVATE_KEY_SECRET }}
