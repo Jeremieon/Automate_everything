@@ -70,7 +70,7 @@ jobs:
       steps:
         - name: Use Public IP in Next Job
           run: |
-            echo "The Public IP is ${{ needs.terraform.outputs.PUBLIC_IP }}"
+            echo "The Public IP is ${{ needs.infra.outputs.PUBLIC_IP }}"
         # - name: Get Public IP
         #   id: get_public_ip
         #   run: echo "::set-output name=public_ip::$(terraform output public_ip)"
