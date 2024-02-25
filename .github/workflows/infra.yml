@@ -73,5 +73,6 @@ jobs:
             echo "$PRIVATE_KEY" > private_key.pem
             chmod 600 private_key.pem
             ssh -i private_key.pem ec2-user@44.200.75.138 "echo Hello from SSH"
+            "ok good"
           # env:
           #   PRIVATE_KEY_SECRET: ${{ secrets.PRIVATE_KEY_SECRET }}
