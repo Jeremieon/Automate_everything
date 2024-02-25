@@ -57,8 +57,8 @@ jobs:
       run: |
         PUBLIC_IP=$(terraform output public_ip)
         echo "Public IP: $PUBLIC_IP"
-      env:
-        TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
+      # env:
+      #   TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
 
     - name: Terraform Destroy
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'destroy')
