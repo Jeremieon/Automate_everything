@@ -54,11 +54,24 @@ jobs:
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'deploy')
       run: terraform apply -auto-approve
 
+    # - name: Get Public IP
+    #   id: get-public-ip
+    #   run: |
+    #     PUBLIC_IP=$(terraform output public_ip)
+    #     echo "Public IP: $PUBLIC_IP"
+    #     echo "::set-output name=public_ip::$PUBLIC_IP"
+
     - name: Get Public IP
       id: get-public-ip
       run: |
-        PUBLIC_IP=$(terraform output public_ip)
+        # Configure Terraform CLI to use Terraform Cloud
+        terraform login
+
+        # Retrieve the public IP from Terraform Cloud output
+        PUBLIC_IP=$(terraform show -json | jq -r '.values.outputs.public_ip.value')
         echo "Public IP: $PUBLIC_IP"
+
+        # Set GitHub Actions output variable
         echo "::set-output name=public_ip::$PUBLIC_IP"
     
     - name: Terraform Destroy
