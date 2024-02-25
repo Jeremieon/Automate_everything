@@ -11,8 +11,8 @@ jobs:
     defaults:
       run:
         working-directory: ./infra
-    # outputs:
-    #   pub_ip: ${{ steps.get-public-ip.outputs.pub_ip }}
+    outputs:
+      pub_ip: ${{ steps.get-public-ip.outputs.pub_ip }}
 
     steps:
     - name: Checkout code
@@ -70,7 +70,7 @@ jobs:
       steps:
         - name: Use Public IP in Next Job
           run: |
-            PUBLIC_IP=${{ needs.get-public-ip.outputs.public_ip }}
+            PUBLIC_IP=${{ needs.get-public-ip.output.pub_ip }}
             echo "Using Public IP: $PUBLIC_IP"
         # - name: Get Public IP
         #   id: get_public_ip
