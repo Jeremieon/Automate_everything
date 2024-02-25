@@ -11,6 +11,8 @@ jobs:
     defaults:
       run:
         working-directory: ./infra
+    outputs:
+      pub_ip: ${{ steps.get-public-ip.outputs.pub_ip }}
 
     steps:
     - name: Checkout code
@@ -56,12 +58,8 @@ jobs:
       id: get-public-ip
       run: |
         PUBLIC_IP=$(terraform output public_ip)
-        echo "Public IP: $PUBLIC_IP"
-        outputs:
-          pub_ip: ${{ steps.get-public-ip.outputs.pub_ip }}
-      # env:
-      #   TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
-
+        echo "Public IP: $PUBLIC_IP" >> "$GITHUB_OUTPUT"
+    
     - name: Terraform Destroy
       if: github.event_name == 'push' && contains(github.event.head_commit.message, 'destroy')
       run: terraform destroy -auto-approve
